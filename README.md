@@ -34,7 +34,7 @@ $$
 $$
 k = k_{\rm base} \cdot \left(1 + a r + b \alpha + c r\alpha + d r^2 + e \alpha^2\right)
 $$
-- 输出参数：$k_{\rm base}、a、b、c、d、e$
+- 输出参数：$k_{\rm base}$、$a$、$b$、$c$、$d$、$e$
 - 保存文件：`step6_results.mat`
 
 **3. θ 扰动优化（步骤7）**
@@ -71,7 +71,7 @@ $$
 $$
 
 ## 4. 分段校正项表达式（取自 `step8_results.mat`）
-- 情况1：$\boldsymbol{\theta_{\rm pert} \le 45^\circ}$
+情况1：$\boldsymbol{\theta_{\rm pert} \le 45^\circ}$
 $$
 \begin{aligned}
 \Delta\theta &= c_0 + c_1\theta_{\rm pert} + c_2\theta_{\rm pert}^2 + c_3\left(\frac{r}{300}\right) + c_4\left(\frac{r}{300}\right)^2 \\
@@ -79,7 +79,7 @@ $$
 \end{aligned}
 $$
 
-- 情况2：$\boldsymbol{\theta_{\rm pert} > 45^\circ}$
+情况2：$\boldsymbol{\theta_{\rm pert} > 45^\circ}$
 $$
 \Delta\theta = d_0 + d_1\theta_{\rm pert} + d_2\theta_{\rm pert}^2 + d_3\left(\frac{r}{300}\right) + d_4\left(\frac{r}{300}\right)^2 + d_5\sin\alpha + d_6\sin2\alpha
 $$
@@ -87,6 +87,7 @@ $$
 ## 最终预测值
 $$
 \boldsymbol{\theta_{\rm pred} = \theta_{\rm pert} + \Delta\theta}
+$$
 
 ## 输出图形说明
 
