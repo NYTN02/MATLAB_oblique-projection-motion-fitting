@@ -22,55 +22,73 @@
 
 将 `theta_correction.m` 放入 MATLAB 工作目录，在命令窗口输入 `theta_correction` 运行。约 1-2 分钟后生成三个 `.mat` 参数文件。
 
-## 算法步骤
+# 算法步骤
+1. 常数 k 拟合
+基于理论解析式，全局搜索最优常数 $k$：
+$$
+\theta_{\rm theory} = \mathrm{atan2}\left( 1 - \sqrt{1 ± k r \left(2\sin\alpha + k r \cos^2\alpha\right)},\; k r \cos\alpha \right) \times \frac{180}{\pi}
+$$
 
-1. **常数 k 拟合**  
-- 基于解析式
-  ```
-  θ_theory = atan2( 1 - √(1 - k·r·(2·sinα + k·r·cos²α)) ,  k·r·cosα ) × 180/π
-  ```
-搜索最优 k。
+2. k 函数优化（步骤6）
+将 $k$ 扩展为关于 $r,\alpha$ 的二次耦合函数，拟合全局参数：
+$$
+k = k_{\rm base} \cdot \left(1 + a r + b \alpha + c r\alpha + d r^2 + e \alpha^2\right)
+$$
+- 输出参数：$k_{\rm base}、a、b、c、d、e$
+- 保存文件：step6_results.mat
 
-2. **k 函数优化（步骤6）**  
-- 将 k 扩展为 r, α 的函数：  
- ```
-k = k_base * (1 + a·r + b·α + c·r·α + d·r² + e·α²)
-```
--  输出参数 `k_base, a, b, c, d, e` 保存于 `step6_results.mat`。
+3. θ 扰动优化（步骤7）
+引入多物理项扰动，修正理论角度固有偏差：
+$$
+\theta_{\rm pert} = \theta_{\rm theory} + A_1 + A_2 r + A_3 \sin\alpha + A_4 \sin2\alpha + A_5 r\sin\alpha
+$$
+- 输出参数：A1~A5
+- 保存文件：step7_results.mat
 
-3. **θ 扰动优化（步骤7）**  
--  对理论 θ 添加扰动：  
-```
-θ_pert = θ_theory + A1 + A2·r + A3·sinα + A4·sin2α + A5·r·sinα
-```
-- 输出参数 `A1~A5` 保存于 `step7_results.mat`。
+4. 分段校正（步骤8）
+以 $\boldsymbol{45^\circ}$ 为阈值，采用两组线性模型分段校正角度误差 $\Delta\theta$
+- 输出两套校正系数
+- 保存文件：step8_results.mat
 
-4. **分段校正（步骤8）**  
--  根据 θ_pert 是否 ≤45° 分别采用两组线性模型（含 θ、θ²、r、r²、sinα、cosα 等项）计算校正量 Δθ。  
--  输出两套系数保存于 `step8_results.mat`。
+---
 
-## 最终预测公式
-将运行得到的参数代入以下表达式，即可计算任意 (r, α) 对应的 θ：
-**1. 原始 θ 解析式（取小角度解）**  
-```θ_theory = atan2( 1 - √(1 - k·r·(2·sinα + k·r·cos²α)) ,  k·r·cosα ) × 180/π```
-**2. k 函数表达式**（参数来自步骤6，保存于 step6_results.mat）  
-```k = k_base × (1 + a·r + b·α + c·r·α + d·r² + e·α²)```
-**3. θ 扰动表达式**（参数来自步骤7，保存于 step7_results.mat）  
-```θ_pert = θ_theory + A1 + A2·r + A3·sinα + A4·sin(2α) + A5·r·sinα```
-**4. θ 校正函数表达式**（参数来自步骤8，保存于 step8_results.mat）  
-- 若 θ_pert ≤ 45°：  
-```
-Δθ = c0 + c1·θ_pert + c2·θ_pert² + c3·(r/300) + c4·(r/300)² + c5·sinα + c6·cosα + c7·sin2α + c8·(r/300)·sinα + c9·(α/90)
-```
-- 若 θ_pert > 45°：  
-```
-Δθ = d0 + d1·θ_pert + d2·θ_pert² + d3·(r/300) + d4·(r/300)² + d5·sinα + d6·sin2α
-```
+# 最终预测公式
+将上述步骤优化得到的参数代入，即可计算任意 $(r,\alpha)$ 对应的预测角度 $\theta_{\rm pred}$。
 
-**最终预测值**：  
-```
-θ_pred = θ_pert + Δθ
-```
+## 1. 原始理论角度解析式
+$$
+\theta_{\rm theory} = \mathrm{atan2}\left( 1 ± \sqrt{1 - k r \left(2\sin\alpha + k r \cos^2\alpha\right)},\; k r \cos\alpha \right) \times \frac{180}{\pi}
+$$
+
+## 2. k 参数化表达式（取自 step6_results.mat）
+$$
+k = k_{\rm base} \cdot \left(1 + a r + b \alpha + c r\alpha + d r^2 + e \alpha^2\right)
+$$
+
+## 3. 扰动后角度表达式（取自 step7_results.mat）
+$$
+\theta_{\rm pert} = \theta_{\rm theory} + A_1 + A_2 r + A_3 \sin\alpha + A_4 \sin2\alpha + A_5 r\sin\alpha
+$$
+
+## 4. 分段校正项表达式（取自 step8_results.mat）
+- 情况1：$\boldsymbol{\theta_{\rm pert} \le 45^\circ}$
+$$
+\begin{aligned}
+\Delta\theta &= c_0 + c_1\theta_{\rm pert} + c_2\theta_{\rm pert}^2 + c_3\left(\frac{r}{300}\right) + c_4\left(\frac{r}{300}\right)^2 \\
+&\quad + c_5\sin\alpha + c_6\cos\alpha + c_7\sin2\alpha + c_8\left(\frac{r}{300}\right)\sin\alpha + c_9\left(\frac{\alpha}{90}\right)
+\end{aligned}
+$$
+
+- 情况2：$\boldsymbol{\theta_{\rm pert} > 45^\circ}$
+$$
+\Delta\theta = d_0 + d_1\theta_{\rm pert} + d_2\theta_{\rm pert}^2 + d_3\left(\frac{r}{300}\right) + d_4\left(\frac{r}{300}\right)^2 + d_5\sin\alpha + d_6\sin2\alpha
+$$
+
+## 最终预测值
+$$
+\boldsymbol{\theta_{\rm pred} = \theta_{\rm pert} + \Delta\theta}
+$$
+
 ## 输出图形说明
 
 程序运行过程中会依次弹出 8 个图形窗口，各图说明如下：
