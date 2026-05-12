@@ -23,32 +23,32 @@
 将 `theta_correction.m` 放入 MATLAB 工作目录，在命令窗口输入 `theta_correction` 运行。约 1-2 分钟后生成三个 `.mat` 参数文件。
 
 # 算法步骤
-1. 常数 k 拟合
+**1. 常数 k 拟合**
 基于理论解析式，全局搜索最优常数 $k$：
 $$
-\theta_{\rm theory} = \mathrm{atan2}\left( 1 - \sqrt{1 ± k r \left(2\sin\alpha + k r \cos^2\alpha\right)},\; k r \cos\alpha \right) \times \frac{180}{\pi}
+\theta_{\rm theory} = \mathrm{atan2}\left( 1 \pm \sqrt{1 - k r \left(2\sin\alpha + k r \cos^2\alpha\right)},\; k r \cos\alpha \right) \times \frac{180}{\pi}
 $$
 
-2. k 函数优化（步骤6）
+**2. k 函数优化（步骤6）**
 将 $k$ 扩展为关于 $r,\alpha$ 的二次耦合函数，拟合全局参数：
 $$
 k = k_{\rm base} \cdot \left(1 + a r + b \alpha + c r\alpha + d r^2 + e \alpha^2\right)
 $$
 - 输出参数：$k_{\rm base}、a、b、c、d、e$
-- 保存文件：step6_results.mat
+- 保存文件：`step6_results.mat`
 
-3. θ 扰动优化（步骤7）
+**3. θ 扰动优化（步骤7）**
 引入多物理项扰动，修正理论角度固有偏差：
 $$
 \theta_{\rm pert} = \theta_{\rm theory} + A_1 + A_2 r + A_3 \sin\alpha + A_4 \sin2\alpha + A_5 r\sin\alpha
 $$
 - 输出参数：A1~A5
-- 保存文件：step7_results.mat
+- 保存文件：`step7_results.mat`
 
-4. 分段校正（步骤8）
+**4. 分段校正（步骤8）**
 以 $\boldsymbol{45^\circ}$ 为阈值，采用两组线性模型分段校正角度误差 $\Delta\theta$
 - 输出两套校正系数
-- 保存文件：step8_results.mat
+- 保存文件：`step8_results.mat`
 
 ---
 
@@ -57,20 +57,20 @@ $$
 
 ## 1. 原始理论角度解析式
 $$
-\theta_{\rm theory} = \mathrm{atan2}\left( 1 ± \sqrt{1 - k r \left(2\sin\alpha + k r \cos^2\alpha\right)},\; k r \cos\alpha \right) \times \frac{180}{\pi}
+\theta_{\rm theory} = \mathrm{atan2}\left( 1 \pm \sqrt{1 - k r \left(2\sin\alpha + k r \cos^2\alpha\right)},\; k r \cos\alpha \right) \times \frac{180}{\pi}
 $$
 
-## 2. k 参数化表达式（取自 step6_results.mat）
+## 2. k 参数化表达式（取自 `step6_results.mat`）
 $$
 k = k_{\rm base} \cdot \left(1 + a r + b \alpha + c r\alpha + d r^2 + e \alpha^2\right)
 $$
 
-## 3. 扰动后角度表达式（取自 step7_results.mat）
+## 3. 扰动后角度表达式（取自 `step7_results.mat`）
 $$
 \theta_{\rm pert} = \theta_{\rm theory} + A_1 + A_2 r + A_3 \sin\alpha + A_4 \sin2\alpha + A_5 r\sin\alpha
 $$
 
-## 4. 分段校正项表达式（取自 step8_results.mat）
+## 4. 分段校正项表达式（取自 `step8_results.mat`）
 - 情况1：$\boldsymbol{\theta_{\rm pert} \le 45^\circ}$
 $$
 \begin{aligned}
@@ -87,7 +87,6 @@ $$
 ## 最终预测值
 $$
 \boldsymbol{\theta_{\rm pred} = \theta_{\rm pert} + \Delta\theta}
-$$
 
 ## 输出图形说明
 
